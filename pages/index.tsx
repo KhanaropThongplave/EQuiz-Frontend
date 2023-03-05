@@ -3,10 +3,16 @@ import { useEffect } from "react";
 import Wallet from "../components/Wallet";
 import { useListen } from "../hooks/useListen";
 import { useMetamask } from "../hooks/useMetamask";
+import Quiz from "./quiz";
 
 const Home: NextPage = () => {
-  const { dispatch } = useMetamask();
+  const {
+    dispatch,
+    state: { status, wallet },
+  } = useMetamask();
   const listen = useListen();
+
+  const isConnected = status !== "pageNotLoaded" && typeof wallet === "string";
 
   useEffect(() => {
     if (typeof window !== undefined) {
@@ -27,12 +33,19 @@ const Home: NextPage = () => {
 
       dispatch({ type: "pageLoaded", isMetamaskInstalled, wallet, balance });
     }
-  }, [dispatch, listen]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <>
-      <Wallet />
-    </>
+    <div>
+      {!isConnected && ( 
+        <Wallet/>
+      )}
+
+      {isConnected && (
+        <Quiz isConnected={isConnected}/>
+      )}
+    </div>
   );
 };
 

@@ -6,7 +6,7 @@ import { Loading } from "./Loading";
 export default function Wallet() {
   const {
     dispatch,
-    state: { status, isMetamaskInstalled, wallet, balance },
+    state: { status, isMetamaskInstalled, wallet },
   } = useMetamask();
   const listen = useListen();
 
@@ -14,8 +14,6 @@ export default function Wallet() {
     status !== "pageNotLoaded" && !isMetamaskInstalled;
   const showConnectButton =
     status !== "pageNotLoaded" && isMetamaskInstalled && !wallet;
-
-  const isConnected = status !== "pageNotLoaded" && typeof wallet === "string";
 
   const handleConnect = async () => {
     dispatch({ type: "loading" });
@@ -34,32 +32,14 @@ export default function Wallet() {
     }
   };
 
-  const handleDisconnect = () => {
-    dispatch({ type: "disconnect" });
-  };
-
   return (
-      <div className="">
-        {wallet && balance && (
-          <div className="">
-            <h3 className="">
-              Address: <span>{wallet}</span>
-            </h3>
-            <p className="">
-              Balance:{" "}
-              <span>
-                {(parseInt(balance) / 1000000000000000000).toFixed(2)}{" "}
-              </span>
-            </p>
-          </div>
-        )}
-
+      <div>
         {showConnectButton && (
           <button
             onClick={handleConnect}
-            className=""
+            className="connect-button"
           >
-            {status === "loading" ? <Loading /> : "Connect Wallet"}
+            <strong>{status === "loading" ? <Loading /> : "Connect Wallet"}</strong>
           </button>
         )}
 
@@ -69,17 +49,6 @@ export default function Wallet() {
               Install Metamask
             </a>
           </Link>
-        )}
-
-        {isConnected && (
-          <div className="">
-            <button
-              onClick={handleDisconnect}
-              className=""
-            >
-              Disconnect
-            </button>
-          </div>
         )}
       </div>
   );
