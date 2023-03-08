@@ -66,6 +66,10 @@ const Quiz = (props: any) => {
   const sendTransaction = async (event:any, score: number) => {
     event.preventDefault();
 
+    if (score == 0) {
+      window.location.reload()
+    }
+
     const accounts = await window.ethereum.request({
       method: "eth_requestAccounts",
     });
@@ -91,27 +95,30 @@ const Quiz = (props: any) => {
         const equizSymbol = await EQuiz.symbol()
 
         if (claim_receipt) {
-          await axios.post("http://localhost:4000/api/equiz-token/claim", {
-            score,
-            claim_receipt,
-          });
-
-          handleDisconnect();
-
-          dispatch({
-            type: "connect",
-            wallet: accounts[0],
-            balance: balance!,
-            token: equizAmount._hex!,
-            symbol: equizSymbol!,
-          });
-
-          setIsLoading(false)
-          window.location.reload()
+          try {
+            await axios.post("http://localhost:4000/api/equiz-token/claim", {
+              score,
+              claim_receipt,
+            });
+          } catch (error) {
+            console.log(error)
+          } finally {
+            dispatch({
+              type: "connect",
+              wallet: accounts[0],
+              balance: balance!,
+              token: equizAmount._hex!,
+              symbol: equizSymbol!,
+            });
+    
+            setIsLoading(false)
+            window.location.reload()
+          }
         }
       } catch (error) {
+        console.log(error)
         setIsLoading(false);
-      }
+      } 
     }
   }
 
