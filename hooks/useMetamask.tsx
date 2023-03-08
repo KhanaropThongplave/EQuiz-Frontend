@@ -1,12 +1,14 @@
 import React, { useEffect, type PropsWithChildren } from "react";
 
-type ConnectAction = { type: "connect"; wallet: string; balance: string };
+type ConnectAction = { type: "connect"; wallet: string; balance: string; token: string; symbol: string; };
 type DisconnectAction = { type: "disconnect" };
 type PageLoadedAction = {
   type: "pageLoaded";
   isMetamaskInstalled: boolean;
   wallet: string | null;
   balance: string | null;
+  token: string | null;
+  symbol: string | null;
 };
 type LoadingAction = { type: "loading" };
 type IdleAction = { type: "idle" };
@@ -27,6 +29,8 @@ type State = {
   isMetamaskInstalled: boolean;
   status: Status;
   balance: string | null;
+  token: string | null;
+  symbol: string | null;
 };
 
 const initialState: State = {
@@ -34,13 +38,15 @@ const initialState: State = {
   isMetamaskInstalled: false,
   status: "loading",
   balance: null,
+  token: null,
+  symbol: null,
 } as const;
 
 function metamaskReducer(state: State, action: Action): State {
   switch (action.type) {
     case "connect": {
-      const { wallet, balance } = action;
-      const newState = { ...state, wallet, balance, status: "idle" } as State;
+      const { wallet, balance, token, symbol} = action;
+      const newState = { ...state, wallet, balance, token, symbol, status: "idle" } as State;
       const info = JSON.stringify(newState);
       window.localStorage.setItem("metamaskState", info);
 
@@ -51,11 +57,11 @@ function metamaskReducer(state: State, action: Action): State {
       if (typeof window.ethereum !== undefined) {
         window.ethereum.removeAllListeners(["accountsChanged"]);
       }
-      return { ...state, wallet: null, balance: null };
+      return { ...state, wallet: null, balance: null, token: null, symbol: null };
     }
     case "pageLoaded": {
-      const { isMetamaskInstalled, balance, wallet } = action;
-      return { ...state, isMetamaskInstalled, status: "idle", wallet, balance };
+      const { isMetamaskInstalled, balance, wallet, token, symbol } = action;
+      return { ...state, isMetamaskInstalled, status: "idle", wallet, balance, token, symbol };
     }
     case "loading": {
       return { ...state, status: "loading" };
